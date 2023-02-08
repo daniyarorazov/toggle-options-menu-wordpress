@@ -30,137 +30,143 @@ add_action('wp_enqueue_scripts', 'my_custom_scripts');
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        var navBlock = document.querySelector("#product-147 > div.summary.entry-summary > h1")
-        const formBlock = document.querySelector("#respond")
-        $(formBlock).append("<button class='edit-fields'>Edit fields showing</button>")
-        $(formBlock).append("<button class='option-button save-changes-fields'>Save</button>")
-        $(formBlock).append("<button class='option-button cancel-changes-fields'>Cancel</button>")
-        const btn = document.querySelector('.edit-fields');
-        const field_rating = document.querySelector("#commentform > div > label")
-        const field_review = document.querySelector("#commentform > p.comment-form-comment > label")
-        const btn_submit = document.querySelector("#submit");
-        const arr = [field_rating, field_review, btn_submit];
-        let itemFromDB = localStorage.getItem("menuOptionsVisibilityState");
-        let listData = itemFromDB.split(',');
-        for (let i = 0; i < 3; i++) {
-            if (listData[i] == "true") {
-                $(`<input type='checkbox' class='checkbox-menu-option'  checked='${true}'/>`).insertBefore(arr[i])
+    var script = document.createElement('script');
+    script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    script.type = 'text/javascript';
+    document.getElementsByTagName('head')[0].appendChild(script);
+
+    script.onload = function() {
+        $(document).ready(function() {
+            const formBlock = document.querySelector(".woocommerce-MyAccount-navigation")
+            $(formBlock).append("<button class='edit-fields'>Edit fields showing</button>")
+            $(formBlock).append("<button class='option-button save-changes-fields'>Save</button>")
+            const btn = document.querySelector('.edit-fields');
+            const optionsMenu = document.querySelectorAll('.woocommerce-MyAccount-navigation-link > a');
+
+
+            let itemFromDB = localStorage.getItem("menuoptionsMenuVisibilityState");
+            let listData = []
+            if (itemFromDB == null) {
+                for (let i = 0; i < optionsMenu.length; i++) {
+                    listData.push('true')
+                }
             } else {
-                // removeAttr('checked');
-                $(`<input type='checkbox' class='checkbox-menu-option''/>`).insertBefore(arr[i])
-
+                listData = itemFromDB.split(',');
             }
-        }
-
-
-
-        // Add an event listener to the navBlock element
-        const checkboxMenuOption = document.querySelectorAll('.checkbox-menu-option');
-        const optionButton = document.querySelectorAll('.option-button');
-
-        for (let elem of checkboxMenuOption) {
-            // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
-            let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
-
-            if ($(elem).prop("checked")) {
-                $(parentBlock).show();
-            } else {
-                $(parentBlock).hide();
-            }
-        }
-
-        btn.addEventListener('click', function() {
-            $(checkboxMenuOption).css('display', 'block');
-            $(optionButton[0]).css('display', 'block');
-            $(optionButton[1]).css('display', 'block');
-            $(this).hide();
-
-            for (let elem of checkboxMenuOption) {
-                // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
-                let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
-
-                console.log(parentBlock)
-                $(parentBlock).show();
-            }
-        });
-
-        const saveChangesBtn = document.querySelector('.save-changes-fields');
-        const cancelChangesBtn = document.querySelector('.cancel-changes-fields');
-
-        saveChangesBtn.addEventListener('click', () => {
-            $(checkboxMenuOption).css('display', 'none');
-            $(btn).show()
-            $(saveChangesBtn).css('display', 'none')
-            $(cancelChangesBtn).css('display', 'none')
-
-            let listValues = [];
-            for (let elem of checkboxMenuOption) {
-                // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
-                let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
-
-                if ($(elem).prop("checked")) {
-                    listValues.push(true)
+            console.log(listData)
+            for (let i = 0; i < listData.length; i++) {
+                // if (optionsMenu[i]) Проверить родителя и сравнять классы, тогда убрать уже у него чекбокс
+                if (listData[i] == "true") {
+                    $(`<input type='checkbox' class='checkbox-menu-option' checked='${true}'/>`).insertBefore(optionsMenu[i])
                 } else {
-                    listValues.push(false)
-                    $(parentBlock).hide();
+                    $(`<input type='checkbox' class='checkbox-menu-option'/>`).insertBefore(optionsMenu[i])
+
                 }
             }
 
-            listValues = listValues.toString();
-
-            localStorage.setItem("menuOptionsVisibilityState", listValues);
-
-        });
-
-        cancelChangesBtn.addEventListener('click', () => {
-            $(checkboxMenuOption).css('display', 'none');
-            $(btn).show()
-            $(saveChangesBtn).css('display', 'none')
-            $(cancelChangesBtn).css('display', 'none')
+            // Add an event listener to the navBlock element
+            const checkboxMenuOption = document.querySelectorAll('.checkbox-menu-option');
+            const optionButton = document.querySelectorAll('.option-button');
 
             for (let elem of checkboxMenuOption) {
-                // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
-                let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
+                let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+
+
 
                 if ($(elem).prop("checked")) {
-
+                    $(parentBlock).show();
                 } else {
                     $(parentBlock).hide();
                 }
             }
 
-            // if (getValueAttr())
+            btn.addEventListener('click', function() {
+                $(checkboxMenuOption).css('display', 'inline-block');
+                $(optionButton[0]).css('display', 'inline-block');
+                $(optionButton[1]).css('display', 'inline-block');
+                $(this).hide();
+
+                for (let elem of checkboxMenuOption) {
+
+                    let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+
+                    $(parentBlock).show();
+                }
+            });
+
+            const saveChangesBtn = document.querySelector('.save-changes-fields');
+
+            saveChangesBtn.addEventListener('click', () => {
+                $(checkboxMenuOption).css('display', 'none');
+                $(btn).show()
+                $(saveChangesBtn).css('display', 'none')
+
+                let listValues = [];
+                for (let elem of checkboxMenuOption) {
+                    let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+
+                    if ($(elem).prop("checked")) {
+                        listValues.push(true)
+                    } else {
+                        listValues.push(false)
+                        $(parentBlock).hide();
+                    }
+                }
+
+                listValues = listValues.toString();
+
+                localStorage.setItem("menuoptionsMenuVisibilityState", listValues);
+
+            });
         });
-
-
-        // for (let elem of checkboxMenuOption) {
-        //     $(checkboxMenuOption).change(() => {
-        //         if ($(elem).prop("checked")) {
-        //             let parentBlock = $(`.${elem.parentNode.classList.value}`);
-        //             $(parentBlock).show();
-        //             localStorage.setItem(parentBlock, true);
-        //         } else {
-        //             let parentBlock = $(`.${elem.parentNode.classList.value}`);
-        //             $(parentBlock).attr('dataVisible', 'false');
-        //             localStorage.setItem(parentBlock, false);
-
-        //         }
-        //     });
-        // }
-
-
-
-
-
-    });
-
-    function getValueAttr(classBlock, nameAttr) {
-        let prices = [];
-        $(`.${classBlock}[${nameAttr}]`).val(function() {
-            prices.push($(this).attr(nameAttr))
-        });
-        prices = prices.toString();
-        return prices;
-    }
+    };
 </script>
+
+
+<ul>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-prehled is-active is-active">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-prehled/">Přehled prodejny</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-nabidka">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-nabidka/">Nabídka prodejny</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-objednavky">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-objednavky/">Historie objednávek</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-transakce">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-transakce/">Transakce</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-profil">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-profil/">Profil prodejny</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-upozorneni">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-upozorneni/">Upozornění</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-sledujici">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-sledujici/">Sledující</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--prodejna-dotaz-na-admina">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/prodejna-dotaz-na-admina/">Dotaz na admina</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--dashboard">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/">Nástěnka</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--orders">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/orders/">Objednávky</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--downloads">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/downloads/">Stahování</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-address">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/edit-address/">Adresy</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-account">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/edit-account/">Detaily účtu</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--oblibene-prodejny">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/oblibene-prodejny/">Oblíbené prodejny</a>
+    </li>
+    <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--customer-logout">
+        <a href="https://vyprodej.kuchyne-oresi.cz/muj-ucet/customer-logout/?_wpnonce=a30829046d">Odhlášení</a>
+    </li>
+</ul>
