@@ -40,13 +40,36 @@ add_action('wp_enqueue_scripts', 'my_custom_scripts');
         const field_rating = document.querySelector("#commentform > div > label")
         const field_review = document.querySelector("#commentform > p.comment-form-comment > label")
         const btn_submit = document.querySelector("#submit");
-        $("<input type='checkbox' class='checkbox-menu-option option_field_rating'  checked/>").insertBefore(field_rating)
-        $("<input type='checkbox' class='checkbox-menu-option option_field_review'  checked/>").insertBefore(field_review)
-        $("<input type='checkbox' class='checkbox-menu-option option_btn_submit'  checked/>").insertBefore(btn_submit)
+        const arr = [field_rating, field_review, btn_submit];
+        let itemFromDB = localStorage.getItem("menuOptionsVisibilityState");
+        let listData = itemFromDB.split(',');
+        for (let i = 0; i < 3; i++) {
+            if (listData[i] == "true") {
+                $(`<input type='checkbox' class='checkbox-menu-option'  checked='${true}'/>`).insertBefore(arr[i])
+            } else {
+                // removeAttr('checked');
+                $(`<input type='checkbox' class='checkbox-menu-option''/>`).insertBefore(arr[i])
+
+            }
+        }
+
+
 
         // Add an event listener to the navBlock element
         const checkboxMenuOption = document.querySelectorAll('.checkbox-menu-option');
         const optionButton = document.querySelectorAll('.option-button');
+
+        for (let elem of checkboxMenuOption) {
+            // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
+            let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
+
+            if ($(elem).prop("checked")) {
+                $(parentBlock).show();
+            } else {
+                $(parentBlock).hide();
+            }
+        }
+
         btn.addEventListener('click', function() {
             $(checkboxMenuOption).css('display', 'block');
             $(optionButton[0]).css('display', 'block');
@@ -71,29 +94,22 @@ add_action('wp_enqueue_scripts', 'my_custom_scripts');
             $(saveChangesBtn).css('display', 'none')
             $(cancelChangesBtn).css('display', 'none')
 
+            let listValues = [];
             for (let elem of checkboxMenuOption) {
                 // let a = getValueAttr(elem.parentNode.classList.value, 'checked');
                 let parentBlock = document.querySelector(`.${elem.parentNode.classList.value}`);
 
                 if ($(elem).prop("checked")) {
-
+                    listValues.push(true)
                 } else {
+                    listValues.push(false)
                     $(parentBlock).hide();
                 }
-
-
-                // if (a === false) {
-                //     let parentBlock = $(`.${elem.parentNode.classList.value}`);
-                //     $(parentBlock).attr('dataVisible', 'false');
-                //     $(parentBlock).css('dataVisible', 'false');
-                //     $(parentBlock).hide();
-
-                // } else {
-                //     let parentBlock = $(`.${elem.parentNode.classList.value}`);
-
-                //     $(parentBlock).show();
-                // }
             }
+
+            listValues = listValues.toString();
+
+            localStorage.setItem("menuOptionsVisibilityState", listValues);
 
         });
 
