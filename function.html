@@ -1,0 +1,110 @@
+<style>
+#product-147>div.summary.entry-summary>h1 {
+    font-weight: 700;
+}
+
+.checkbox-menu-option,
+.option-button,
+.checkbox-menu-option-active,
+.hide-element {
+    display: none;
+}
+	
+.edit-fields {
+    border: 1px solid #000;
+    background-color: transparent;
+    padding: 5px;
+}
+</style>	
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	 var script = document.createElement('script');
+    script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    script.type = 'text/javascript';
+    document.getElementsByTagName('head')[0].appendChild(script);
+
+    script.onload = function() {
+			$(document).ready(function() {
+				const formBlock = document.querySelector(".woocommerce-MyAccount-navigation")
+				$(formBlock).append("<button class='edit-fields'>Edit fields showing</button>")
+				$(formBlock).append("<button class='option-button save-changes-fields'>Save</button>")
+				const editBtn = document.querySelector('.edit-fields');
+				const optionsMenu = document.querySelectorAll('.woocommerce-MyAccount-navigation-link > a');
+
+				let itemFromDB = localStorage.getItem("menuoptionsMenuVisibilityState");
+				let listData = []
+				
+				if (itemFromDB == null) {
+						for (let i = 0; i < optionsMenu.length; i++) {
+								listData.push('true')
+						}
+				} else {
+						listData = itemFromDB.split(',');
+				}
+				
+				for (let i = 0; i < listData.length; i++) {
+						if (listData[i] == "true") {
+								$(`<input type='checkbox' class='checkbox-menu-option' checked='${true}'/>`).insertBefore(optionsMenu[i])
+						} else {
+								$(`<input type='checkbox' class='checkbox-menu-option'/>`).insertBefore(optionsMenu[i])
+						}
+				}
+
+				// Add an event listener to the navBlock element
+				const checkboxMenuOption = document.querySelectorAll('.checkbox-menu-option');
+				const optionButton = document.querySelectorAll('.option-button');
+
+				for (let elem of checkboxMenuOption) {
+						let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+
+						if ($(elem).prop("checked")) {
+								$(parentBlock).show();
+						} else {
+								$(parentBlock).hide();
+						}
+				}
+
+				editBtn.addEventListener('click', function() {
+						$(checkboxMenuOption).css('display', 'inline-block');
+						$(optionButton[0]).css('display', 'inline-block');
+						$(optionButton[1]).css('display', 'inline-block');
+						$(this).hide();
+
+						for (let elem of checkboxMenuOption) {
+								let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+                let classBlock = $(parentBlock).attr('class');
+
+                if(classBlock.includes('woocommerce-MyAccount-navigation-link--customer-logout')) {
+                  $(elem).css('display', 'none');
+                }
+								$(parentBlock).show();
+						}
+				});
+
+				const saveChangesBtn = document.querySelector('.save-changes-fields');
+
+				saveChangesBtn.addEventListener('click', () => {
+						$(checkboxMenuOption).css('display', 'none');
+						$(editBtn).show()
+						$(saveChangesBtn).css('display', 'none')
+
+						let listValues = [];
+						for (let elem of checkboxMenuOption) {
+								let parentBlock = document.getElementsByClassName(`${elem.parentNode.classList.value}`);
+
+								if ($(elem).prop("checked")) {
+										listValues.push(true)
+								} else {
+										listValues.push(false)
+										$(parentBlock).hide();
+								}
+						}
+
+						listValues = listValues.toString();
+
+						localStorage.setItem("menuoptionsMenuVisibilityState", listValues);
+
+				});
+			});
+		}
+</script>
